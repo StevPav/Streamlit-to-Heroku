@@ -1,1 +1,2 @@
-web: sh setup.sh && streamlit run app.py
+web: gunicorn dashboard:app
+heroku ps:scale web=1
