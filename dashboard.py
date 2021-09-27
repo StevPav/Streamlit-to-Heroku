@@ -9,6 +9,7 @@ import plotly.graph_objects as go
 from sklearn import model_selection
 from sklearn.neighbors import NearestNeighbors
 import seaborn as sns
+import dvc.api
 
 st.set_page_config(layout="wide")
 
@@ -18,24 +19,24 @@ def load_data():
 	Ne prend pas de paramètres en entrée
 	'''
 
-	# Chargement du modèle pré-entrainé
-	pickle_in=open('lgbm_model.pkl', 'rb')
-	lgbm=pickle.load(pickle_in)
+	# Chargement du modèle pré-entrainé	
+	pickle_in = dvc.api.read('lgbm_model.pkl',
+    repo='https://github.com/StevPav/Streamlit-to-Heroku.git',
+    mode='rb')
+	#pickle_in=open('lgbm_model.pkl', 'rb')
+	lgbm=pickle.loads(pickle_in)
 
 	#Chargement des données de test
-	df_app=pd.read_csv('Data/application_train.csv')
-	df_app=df_app.sample(frac=0.5,random_state=10)
-	db_train,db_test=model_selection.train_test_split(df_app,test_size=0.3,stratify=df_app['TARGET'],random_state=0)
+	db_test=pd.read_csv('https://github.com/StevPav/Streamlit-to-Heroku/blob/7d55ef87619bd98f55195541061e84c9de012e6e/df_app.csv?raw=true')
 	db_test['YEARS_BIRTH']=(db_test['DAYS_BIRTH']/-365).apply(lambda x: int(x))
 	db_test=db_test.reset_index(drop=True)
-	df_test=pd.read_csv('df_test.csv')
-	y_test=pd.read_csv('y_test.csv')
+	df_test=pd.read_csv('https://github.com/StevPav/Streamlit-to-Heroku/blob/7d55ef87619bd98f55195541061e84c9de012e6e/df_test.csv?raw=true')
 
 	#Calcul des SHAP values
 	explainer = shap.TreeExplainer(lgbm)
 	shap_values = explainer.shap_values(df_test)[1]
 	exp_value=explainer.expected_value[1]
-	return db_test,df_test,y_test,shap_values,lgbm,exp_value
+	return db_test,df_test,shap_values,lgbm,exp_value
 
 
 def tab_client(db_test):
@@ -115,10 +116,10 @@ def score_viz(lgbm,df_test,client,exp_value,shap_values):
 
 	st_shap(shap.force_plot(exp_value, shap_values[client], features = df_test.iloc[client], feature_names=df_test.columns, figsize=(12,5)))
 
-def prediction(modèle,df_test,id):
+def prediction(model,df_test,id):
 	'''Fonction permettant de prédire la capacité du client à rembourser son emprunt.
 	les paramètres sont le modèle, le dataframe et l'ID du client'''
-	y_pred=lgbm.predict_proba(df_test)[id,1]
+	y_pred=model.predict_proba(df_test)[id,1]
 	decision=np.where(y_pred>0.5,"Rejected","Approved")
 	return y_pred,decision
 
@@ -224,7 +225,7 @@ def chart_bar(title,row,df,col,client):
 def main():
 	"""Fonction principale permettant l'affichage de la fenêtre latérale avec les 3 onglets.
 	"""
-	db_test,df_test,y_test,shap_values,lgbm,exp_value=load_data()
+	db_test,df_test,shap_values,lgbm,exp_value=load_data()
 
 	PAGES = [
 	    "Tableau clientèle",
