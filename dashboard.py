@@ -176,7 +176,7 @@ def get_neigh(df,idx_client):
 	"""Calcul des voisins les plus proches du client sélectionné
 	Sélection du nombre de voisins par un slider.
 	Retourne les proches voisins et un booléen indiquant la clientèle globale ou non"""
-	row1,row_spacer1,row2,row_spacer2 = st.columns(4)
+	row1,row_spacer1,row2,row_spacer2 = st.columns([1,.1,.3,3])
 	size=row1.slider("Taille du groupe de comparaison",min_value=10,max_value=1000,value=500)
 	row2.write('')
 	total=row2.button(label="Clientèle globale")
@@ -190,13 +190,13 @@ def display_charts(df,client):
 	"""Affichae des graphes de comparaison pour le client sélectionné """
 	row1_1,row1_2,row1_3 = st.columns(3)
 	st.write('')
-	row2_1,row2_2,row2_3 = st.columns(3)
+	row2_10,row2_2,row2_3 = st.columns(3)
 	
 	chart_kde("Répartition de l'age",row1_1,df,'YEARS_BIRTH',client)
 	chart_kde("Répartition des revenus",row1_2,df,'AMT_INCOME_TOTAL',client)
 	chart_bar("Répartition du nombre d'enfants",row1_3,df,'CNT_CHILDREN',client)
 
-	chart_bar("Répartition du statut professionel",row2_1,df,'NAME_INCOME_TYPE',client)
+	chart_bar("Répartition du statut professionel",row2_10,df,'NAME_INCOME_TYPE',client)
 	chart_bar("Répartition du niveau d'études",row2_2,df,'NAME_EDUCATION_TYPE',client)
 	chart_bar("Répartition du type de logement",row2_3,df,'NAME_HOUSING_TYPE',client)
 	st.dataframe(df[['SK_ID_CURR','CODE_GENDER','YEARS_BIRTH','NAME_FAMILY_STATUS','CNT_CHILDREN',
