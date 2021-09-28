@@ -10,6 +10,7 @@ from sklearn import model_selection
 from sklearn.neighbors import NearestNeighbors
 import seaborn as sns
 import dvc.api
+import lightgbm
 
 st.set_page_config(layout="wide")
 
