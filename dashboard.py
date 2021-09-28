@@ -176,10 +176,10 @@ def get_neigh(df,idx_client):
 	"""Calcul des voisins les plus proches du client sélectionné
 	Sélection du nombre de voisins par un slider.
 	Retourne les proches voisins et un booléen indiquant la clientèle globale ou non"""
-	row0_1,row_spacer1,row0_2,row_spacer2 = st.columns([1,.1,.3,3])
-	size=row0_1.slider("Taille du groupe de comparaison",min_value=10,max_value=1000,value=500)
-	row0_2.write('')
-	total=row0_2.button(label="Clientèle globale")
+	row1,row_spacer1,row2,row_spacer2 = st.columns(4)
+	size=row1.slider("Taille du groupe de comparaison",min_value=10,max_value=1000,value=500)
+	row2.write('')
+	total=row2.button(label="Clientèle globale")
 	neigh= NearestNeighbors(n_neighbors=size)
 	neigh.fit(df)
 	k_neigh=neigh.kneighbors(df.loc[idx_client].values.reshape(1,-1),return_distance=False)[0]
